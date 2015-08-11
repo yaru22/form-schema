@@ -72,6 +72,27 @@ describe('form-shape', () => {
       errors.should.have.length(1);
       errors[0].should.equal('not a string');
     });
+
+    it('should validate required field', () => {
+      const schema = field(isString).isRequired();
+      const data = 'hello';
+      const { isValid } = validate(data, schema);
+      isValid.should.be.true;
+    });
+
+    it('should fail to validate due to missing required field', () => {
+      const schema = field(isString).isRequired();
+      const { isValid, errors } = validate(undefined, schema);
+      isValid.should.be.false;
+      errors.should.have.length(1);
+      errors[0].should.equal('The field is required.');
+    });
+
+    it('should validate undefined field since it is not required', () => {
+      const schema = field(isString);
+      const { isValid } = validate(undefined, schema);
+      isValid.should.be.true;
+    });
   });
 
   describe('complex data', () => {
@@ -100,6 +121,16 @@ describe('form-shape', () => {
         isValid.should.be.false;
         errors.should.have.length(1);
         errors[0].should.equal('Expected an array but got a object.');
+      });
+
+      it('should fail to validate due to required element missing', () => {
+        const schema = [field(isString).isRequired()];
+        const data = ['hello', 'world', undefined];
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.false;
+        errors.should.have.length(data.length);
+        errors[2].should.have.length(1);
+        errors[2][0].should.equal('The field is required.');
       });
     });
 
@@ -154,6 +185,24 @@ describe('form-shape', () => {
         errors.should.have.length(1);
         errors[0].should.equal('Expected an object but got a array.');
       });
+
+      it('should fail to validate due to required key missing', () => {
+        const schema = {
+          id: field(isString).isRequired(),
+          name: field(isString).isRequired(),
+          isMale: field(isBoolean).isRequired(),
+        };
+        const data = {
+          name: 'Brian',
+          isMale: true,
+        };
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.false;
+        should.equal(null, errors.name);
+        should.equal(null, errors.isMale);
+        errors.id.should.have.length(1);
+        errors.id[0].should.equal('The field is required.');
+      });
     });
 
     describe('object and array mixed', () => {
@@ -201,23 +250,42 @@ describe('form-shape', () => {
       });
 
       it('should validate an object with arrays', () => {
+        const schema = {
+          id: field(isString).isRequired(),
+          name: field(isString).isRequired(),
+          biweekly: field(isBoolean),
+          data: [field(isNumber).isRequired()],
+        };
+        const data = {
+          id: 'id1',
+          name: 'ABC',
+          biweekly: false,
+          data: [0, 1, 1, 1, 1, 1, 0],
+        };
+        const { isValid } = validate(data, schema);
+        isValid.should.be.true;
+      });
+
+      it('should validate an object with arrays', () => {
+        const schema = {
+          id: field(isString).isRequired(),
+          name: field(isString).isRequired(),
+          biweekly: field(isBoolean),
+          data: [field(isNumber).isRequired()],
+        };
+        const data = {
+          name: 'ABC',
+          biweekly: false,
+          data: [0, 1, 1, 1, 1, 1, 0],
+        };
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.false;
+        should.equal(null, errors.name);
+        should.equal(null, errors.biweekly);
+        should.equal(null, errors.data);
+        errors.id.should.have.length(1);
+        errors.id[0].should.equal('The field is required.');
       });
     });
   });
 });
-
-// const data = {
-//   id: 'id1',
-//   name: 'ABC',
-//   biweekly: false,
-//   data: [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]],
-// };
-
-// const nv = () => ({ isValid: false, error: 'hello' });
-
-// const schema = {
-//   id: field(nv),
-//   name: field(nv),
-//   biweekly: field(nv),
-//   data: [field(nv)],
-// };

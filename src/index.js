@@ -1,10 +1,24 @@
 class FormField {
   constructor(...args) {
-    this.validators = args;
+    this._validators = args;
+  }
+
+  isRequired() {
+    this._isRequired = true;
+    return this;
   }
 
   validate(value) {
-    const result = this.validators.reduce(({ isValid, errors }, validator) => {
+    if (typeof value === 'undefined') {
+      return this._isRequired ? {
+        isValid: false,
+        errors: ['The field is required.'],
+      } : {
+        isValid: true,
+        errors: [],
+      };
+    }
+    const result = this._validators.reduce(({ isValid, errors }, validator) => {
       const { isValid: valid, error } = validator(value);
       if (!valid) {
         errors.push(error || valid);
