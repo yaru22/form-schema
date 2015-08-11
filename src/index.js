@@ -17,7 +17,10 @@ class FormField {
       isValid: true,
       errors: [],
     });
-    return result;
+    return {
+      ...result,
+      data: value,
+    };
   }
 }
 
@@ -25,7 +28,7 @@ export function field(...args) {
   return new FormField(...args);
 }
 
-export default function validate(data, schema) {
+function _validateHelper(data, schema) {
   let dataType = typeof data;
   dataType = (dataType === 'object' && Array.isArray(data)) ? 'array' : dataType;
 
@@ -36,8 +39,12 @@ export default function validate(data, schema) {
   } else if (Array.isArray(schema)) {  // array
     if (Array.isArray(data)) {
       // iterate array and validate element
-      const resultArr = data.map(x => validate(x, schema[0]));
-      return resultArr;
+      const resultArr = data.map(x => _validateHelper(x, schema[0]));
+      const isValid = resultArr.every(x => x.isValid);
+      return {
+        isValid,
+        result: resultArr,
+      };
     }
     return {
       isValid: false,
@@ -47,10 +54,14 @@ export default function validate(data, schema) {
     if (dataType === 'object') {
       // iterate key and validate value
       const resultObj = Object.keys(schema).reduce((acc, key) => {
-        acc[key] = validate(data[key], schema[key]);
+        acc[key] = _validateHelper(data[key], schema[key]);
         return acc;
       }, {});
-      return resultObj;
+      const isValid = Object.keys(resultObj).every(key => resultObj[key].isValid);
+      return {
+        isValid,
+        result: resultObj,
+      };
     }
     return {
       isValid: false,
@@ -58,4 +69,31 @@ export default function validate(data, schema) {
     };
   }
   throw new Error('wtf?');
+}
+
+function _compactResult(result) {
+  if (result.isValid) {
+    return null;
+  } else if (result.result) {
+    const subResult = result.result;
+    if (Array.isArray(subResult)) {
+      return subResult.map(_compactResult);
+    } else if (typeof subResult === 'object') {
+      return Object.keys(subResult).reduce((acc, key) => {
+        acc[key] = _compactResult(subResult[key]);
+        return acc;
+      }, {});
+    }
+    throw new Error('wtf2');
+  }
+  return result.errors;
+}
+
+export default function validate(data, schema) {
+  const result = _validateHelper(data, schema);
+  const compactResult = _compactResult(result);
+  return {
+    isValid: result.isValid,
+    errors: compactResult,
+  };
 }

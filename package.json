@@ -9,7 +9,8 @@
     "clean": "scripts/clean",
     "lint": "scripts/lint",
     "prepublish": "scripts/prepublish",
-    "test": "scripts/test"
+    "test": "scripts/test",
+    "test:watch": "scripts/test-watch"
   },
   "keywords": [
     "form",

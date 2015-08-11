@@ -1,0 +1,15 @@
+#!/bin/sh -e
+
+echo "Running tests."
+
+NODE_ENV=test NODE_PATH=.:${NODE_PATH} `npm bin`/mocha \
+    --compilers js:babel/register \
+    --bail \
+    --check-leaks \
+    --growl \
+    --recursive \
+    --reporter spec \
+    --ui bdd \
+    --watch \
+    $(find test -name \*.test.js) \
+    $@

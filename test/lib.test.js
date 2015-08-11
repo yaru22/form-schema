@@ -2,7 +2,7 @@ import chai from 'chai';
 
 import validate, { field } from '../src/';
 
-chai.should();
+const should = chai.should();
 
 const isNumber = n => (Number.isFinite(n) ?
     { isValid: true } : { isValid: false, error: 'not a number' });
@@ -18,9 +18,8 @@ describe('form-shape', () => {
     it('should validate a number', () => {
       const schema = field(isNumber);
       const data = 5;
-      const { isValid, errors } = validate(data, schema);
+      const { isValid } = validate(data, schema);
       isValid.should.be.true;
-      errors.should.be.empty;
     });
 
     it('should fail to validate since it is a string', () => {
@@ -35,9 +34,8 @@ describe('form-shape', () => {
     it('should validate an even number', () => {
       const schema = field(isNumber, isEven);
       const data = 4;
-      const { isValid, errors } = validate(data, schema);
+      const { isValid } = validate(data, schema);
       isValid.should.be.true;
-      errors.should.be.empty;
     });
 
     it('should fail to validate since it is not an even number', () => {
@@ -62,9 +60,8 @@ describe('form-shape', () => {
     it('should validate a string', () => {
       const schema = field(isString);
       const data = 'test';
-      const { isValid, errors } = validate(data, schema);
+      const { isValid } = validate(data, schema);
       isValid.should.be.true;
-      errors.should.be.empty;
     });
 
     it('should fail to validate since it is not a string', () => {
@@ -82,22 +79,18 @@ describe('form-shape', () => {
       it('should validate an array of numbers', () => {
         const schema = [field(isNumber)];
         const data = [1, 3, 2, 4, 0];
-        const result = validate(data, schema);
-        result.should.have.length(data.length);
-        result.forEach(x => {
-          x.isValid.should.be.true;
-          x.errors.should.be.empty;
-        });
+        const { isValid } = validate(data, schema);
+        isValid.should.be.true;
       });
 
       it('should fail to validate an array of numbers due to a string', () => {
         const schema = [field(isNumber)];
         const data = [1, 3, 2, 'not-a-number', 4, 0];
-        const result = validate(data, schema);
-        result.should.have.length(data.length);
-        result[3].isValid.should.be.false;
-        result[3].errors.should.have.length(1);
-        result[3].errors[0].should.equal('not a number');
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.false;
+        errors.should.have.length(data.length);
+        errors[3].should.have.length(1);
+        errors[3][0].should.equal('not a number');
       });
 
       it('should fail to validate since it is an object', () => {
@@ -122,13 +115,8 @@ describe('form-shape', () => {
           name: 'Brian',
           isMale: true,
         };
-        const result = validate(data, schema);
-        result.id.isValid.should.be.true;
-        result.id.errors.should.be.empty;
-        result.name.isValid.should.be.true;
-        result.name.errors.should.be.empty;
-        result.isMale.isValid.should.be.true;
-        result.isMale.errors.should.be.empty;
+        const { isValid } = validate(data, schema);
+        isValid.should.be.true;
       });
 
       it('should fail to validate an object due to an invalid field', () => {
@@ -142,14 +130,12 @@ describe('form-shape', () => {
           name: 'Brian',
           isMale: 'not-a-boolean',
         };
-        const result = validate(data, schema);
-        result.id.isValid.should.be.true;
-        result.id.errors.should.be.empty;
-        result.name.isValid.should.be.true;
-        result.name.errors.should.be.empty;
-        result.isMale.isValid.should.be.false;
-        result.isMale.errors.should.have.length(1);
-        result.isMale.errors[0].should.equal('not a boolean');
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.false;
+        should.equal(null, errors.id);
+        should.equal(null, errors.name);
+        errors.isMale.should.have.length(1);
+        errors.isMale[0].should.equal('not a boolean');
       });
 
       it('should fail to validate since it is an array', () => {
@@ -172,6 +158,46 @@ describe('form-shape', () => {
 
     describe('object and array mixed', () => {
       it('should validate an array of objects', () => {
+        const schema = [{
+          id: field(isString),
+          name: field(isString),
+        }];
+        const data = [
+          {
+            id: 'id1',
+            name: 'Brian',
+          },
+          {
+            id: 'id1',
+            name: 'Caroline',
+          },
+        ];
+        const { isValid } = validate(data, schema);
+        isValid.should.be.true;
+      });
+
+      it('should fail to validate an array of objects due to mismatching elements', () => {
+        const schema = [{
+          id: field(isString),
+          name: field(isString),
+        }];
+        const data = [
+          {
+            id: 'id1',
+            name: 'Brian',
+          },
+          'hello',  // error
+          {
+            id: 'id1',
+            name: 33,  // error
+          },
+        ];
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.false;
+        errors[1].should.have.length(1);
+        errors[1][0].should.equal('Expected an object but got a string.');
+        errors[2].name.should.have.length(1);
+        errors[2].name[0].should.equal('not a string');
       });
 
       it('should validate an object with arrays', () => {
