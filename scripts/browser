@@ -1,3 +1,3 @@
 #!/bin/sh -e
 
-NODE_ENV=production `npm bin`/webpack src/index.js dist/form-shape.min.js
+NODE_ENV=production `npm bin`/webpack src/index.js dist/form-schema.min.js

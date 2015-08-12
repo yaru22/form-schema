@@ -1,5 +1,5 @@
 {
-  "name": "form-shape",
+  "name": "form-schema",
   "version": "0.1.0",
   "description": "A form validation tool that traverses the data accoding to the schema and calls the validators.",
   "main": "lib/index.js",

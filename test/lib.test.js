@@ -13,7 +13,7 @@ const isBoolean = b => (typeof b === 'boolean' ?
 const isEven = n => (n % 2 === 0 ?
     { isValid: true } : { isValid: false, error: 'not an even number' });
 
-describe('form-shape', () => {
+describe('form-schema', () => {
   describe('primitives', () => {
     it('should validate a number', () => {
       const schema = field(isNumber);
