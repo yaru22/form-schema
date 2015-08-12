@@ -1,52 +1,5 @@
-class FormField {
-  constructor(...args) {
-    this._validators = args;
-  }
-
-  isRequired() {
-    this._isRequired = true;
-    return this;
-  }
-
-  validate(value) {
-    if (typeof value === 'undefined') {
-      return this._isRequired ? {
-        isValid: false,
-        errors: ['The field is required.'],
-      } : {
-        isValid: true,
-        errors: [],
-      };
-    }
-    const result = this._validators.reduce(({ isValid, errors }, validator) => {
-      const { isValid: valid, error } = validator(value);
-      if (!valid) {
-        errors.push(error || valid);
-      }
-      return {
-        isValid: isValid && valid,
-        errors,
-      };
-    }, {
-      isValid: true,
-      errors: [],
-    });
-    return {
-      ...result,
-      data: value,
-    };
-  }
-}
-
-class FormFieldError extends Error {
-  constructor(reasons, data) {
-    super();
-    this.name = 'FormFieldError';
-    this.reasons = reasons;
-    this.data = data;
-    Error.captureStackTrace(this, FormFieldError);
-  }
-}
+import FormField from './FormField';
+import FormFieldError from './FormFieldError';
 
 export function field(...args) {
   return new FormField(...args);
@@ -92,7 +45,7 @@ function _validateHelper(data, schema) {
       errors: [`Expected an object but got a ${dataType}.`],
     };
   }
-  throw new Error('wtf?');
+  throw new Error('_validateHelper(): Not supposed to reach here.');
 }
 
 function _compactResult(result) {
@@ -108,7 +61,7 @@ function _compactResult(result) {
         return acc;
       }, {});
     }
-    throw new Error('wtf2');
+    throw new Error('_compactResult(): Not supposed to reach here.');
   }
   return new FormFieldError(result.errors, result.data);
 }
