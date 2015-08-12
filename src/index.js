@@ -38,6 +38,16 @@ class FormField {
   }
 }
 
+class FormFieldError extends Error {
+  constructor(reasons, data) {
+    super();
+    this.name = 'FormFieldError';
+    this.reasons = reasons;
+    this.data = data;
+    Error.captureStackTrace(this, FormFieldError);
+  }
+}
+
 export function field(...args) {
   return new FormField(...args);
 }
@@ -100,7 +110,7 @@ function _compactResult(result) {
     }
     throw new Error('wtf2');
   }
-  return result.errors;
+  return new FormFieldError(result.errors, result.data);
 }
 
 export default function validate(data, schema) {

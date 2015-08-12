@@ -27,8 +27,8 @@ describe('form-shape', () => {
       const data = 'not-a-number';
       const { isValid, errors } = validate(data, schema);
       isValid.should.be.false;
-      errors.should.have.length(1);
-      errors[0].should.equal('not a number');
+      errors.reasons.should.have.length(1);
+      errors.reasons[0].should.equal('not a number');
     });
 
     it('should validate an even number', () => {
@@ -43,8 +43,8 @@ describe('form-shape', () => {
       const data = 5;
       const { isValid, errors } = validate(data, schema);
       isValid.should.be.false;
-      errors.should.have.length(1);
-      errors[0].should.equal('not an even number');
+      errors.reasons.should.have.length(1);
+      errors.reasons[0].should.equal('not an even number');
     });
 
     it('should fail to validate since it is a string', () => {
@@ -52,9 +52,9 @@ describe('form-shape', () => {
       const data = 'not-a-number';
       const { isValid, errors } = validate(data, schema);
       isValid.should.be.false;
-      errors.should.have.length(2);
-      errors[0].should.equal('not a number');
-      errors[1].should.equal('not an even number');
+      errors.reasons.should.have.length(2);
+      errors.reasons[0].should.equal('not a number');
+      errors.reasons[1].should.equal('not an even number');
     });
 
     it('should validate a string', () => {
@@ -69,8 +69,8 @@ describe('form-shape', () => {
       const data = 7;
       const { isValid, errors } = validate(data, schema);
       isValid.should.be.false;
-      errors.should.have.length(1);
-      errors[0].should.equal('not a string');
+      errors.reasons.should.have.length(1);
+      errors.reasons[0].should.equal('not a string');
     });
 
     it('should validate required field', () => {
@@ -84,8 +84,8 @@ describe('form-shape', () => {
       const schema = field(isString).isRequired();
       const { isValid, errors } = validate(undefined, schema);
       isValid.should.be.false;
-      errors.should.have.length(1);
-      errors[0].should.equal('The field is required.');
+      errors.reasons.should.have.length(1);
+      errors.reasons[0].should.equal('The field is required.');
     });
 
     it('should validate undefined field since it is not required', () => {
@@ -110,8 +110,8 @@ describe('form-shape', () => {
         const { isValid, errors } = validate(data, schema);
         isValid.should.be.false;
         errors.should.have.length(data.length);
-        errors[3].should.have.length(1);
-        errors[3][0].should.equal('not a number');
+        errors[3].reasons.should.have.length(1);
+        errors[3].reasons[0].should.equal('not a number');
       });
 
       it('should fail to validate since it is an object', () => {
@@ -119,8 +119,8 @@ describe('form-shape', () => {
         const data = { name: 'Brian' };
         const { isValid, errors } = validate(data, schema);
         isValid.should.be.false;
-        errors.should.have.length(1);
-        errors[0].should.equal('Expected an array but got a object.');
+        errors.reasons.should.have.length(1);
+        errors.reasons[0].should.equal('Expected an array but got a object.');
       });
 
       it('should fail to validate due to required element missing', () => {
@@ -129,8 +129,8 @@ describe('form-shape', () => {
         const { isValid, errors } = validate(data, schema);
         isValid.should.be.false;
         errors.should.have.length(data.length);
-        errors[2].should.have.length(1);
-        errors[2][0].should.equal('The field is required.');
+        errors[2].reasons.should.have.length(1);
+        errors[2].reasons[0].should.equal('The field is required.');
       });
     });
 
@@ -165,8 +165,8 @@ describe('form-shape', () => {
         isValid.should.be.false;
         should.equal(null, errors.id);
         should.equal(null, errors.name);
-        errors.isMale.should.have.length(1);
-        errors.isMale[0].should.equal('not a boolean');
+        errors.isMale.reasons.should.have.length(1);
+        errors.isMale.reasons[0].should.equal('not a boolean');
       });
 
       it('should fail to validate since it is an array', () => {
@@ -182,8 +182,8 @@ describe('form-shape', () => {
         }];
         const { isValid, errors } = validate(data, schema);
         isValid.should.be.false;
-        errors.should.have.length(1);
-        errors[0].should.equal('Expected an object but got a array.');
+        errors.reasons.should.have.length(1);
+        errors.reasons[0].should.equal('Expected an object but got a array.');
       });
 
       it('should fail to validate due to required key missing', () => {
@@ -200,8 +200,8 @@ describe('form-shape', () => {
         isValid.should.be.false;
         should.equal(null, errors.name);
         should.equal(null, errors.isMale);
-        errors.id.should.have.length(1);
-        errors.id[0].should.equal('The field is required.');
+        errors.id.reasons.should.have.length(1);
+        errors.id.reasons[0].should.equal('The field is required.');
       });
     });
 
@@ -243,10 +243,10 @@ describe('form-shape', () => {
         ];
         const { isValid, errors } = validate(data, schema);
         isValid.should.be.false;
-        errors[1].should.have.length(1);
-        errors[1][0].should.equal('Expected an object but got a string.');
-        errors[2].name.should.have.length(1);
-        errors[2].name[0].should.equal('not a string');
+        errors.should.have.length(data.length);
+        errors[1].reasons[0].should.equal('Expected an object but got a string.');
+        errors[2].name.reasons.should.have.length(1);
+        errors[2].name.reasons[0].should.equal('not a string');
       });
 
       it('should validate an object with arrays', () => {
@@ -266,7 +266,7 @@ describe('form-shape', () => {
         isValid.should.be.true;
       });
 
-      it('should validate an object with arrays', () => {
+      it('should fail to validate an object with missing required field', () => {
         const schema = {
           id: field(isString).isRequired(),
           name: field(isString).isRequired(),
@@ -283,8 +283,8 @@ describe('form-shape', () => {
         should.equal(null, errors.name);
         should.equal(null, errors.biweekly);
         should.equal(null, errors.data);
-        errors.id.should.have.length(1);
-        errors.id[0].should.equal('The field is required.');
+        errors.id.reasons.should.have.length(1);
+        errors.id.reasons[0].should.equal('The field is required.');
       });
     });
   });
