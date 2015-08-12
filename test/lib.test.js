@@ -288,4 +288,25 @@ describe('form-schema', () => {
       });
     });
   });
+
+  describe('validators', () => {
+    it('should supply field data and entire form data', () => {
+      const data = {
+        id: 'id1',
+        name: 'ABC',
+      };
+      const testValidator = (fieldData, dataRoot) => {
+        dataRoot.should.equal(data);
+        return {
+          isValid: true,
+        }
+      };
+      const schema = {
+        id: field(testValidator).isRequired(),
+        name: field(testValidator).isRequired(),
+      };
+      const { isValid } = validate(data, schema);
+      isValid.should.be.true;
+    });
+  });
 });

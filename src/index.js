@@ -5,18 +5,18 @@ export function field(...args) {
   return new FormField(...args);
 }
 
-function _validateHelper(data, schema) {
+function _validateHelper(data, schema, dataRoot) {
   let dataType = typeof data;
   dataType = (dataType === 'object' && Array.isArray(data)) ? 'array' : dataType;
 
   if (schema instanceof FormField) {
     // NOTE: You cannot assume the data at this point is a primitive.
-    const result = schema.validate(data);
+    const result = schema.validate(data, dataRoot);
     return result;
   } else if (Array.isArray(schema)) {  // array
     if (Array.isArray(data)) {
       // iterate array and validate element
-      const resultArr = data.map(x => _validateHelper(x, schema[0]));
+      const resultArr = data.map(x => _validateHelper(x, schema[0], dataRoot));
       const isValid = resultArr.every(x => x.isValid);
       return {
         isValid,
@@ -31,7 +31,7 @@ function _validateHelper(data, schema) {
     if (dataType === 'object') {
       // iterate key and validate value
       const resultObj = Object.keys(schema).reduce((acc, key) => {
-        acc[key] = _validateHelper(data[key], schema[key]);
+        acc[key] = _validateHelper(data[key], schema[key], dataRoot);
         return acc;
       }, {});
       const isValid = Object.keys(resultObj).every(key => resultObj[key].isValid);
@@ -67,7 +67,7 @@ function _compactResult(result) {
 }
 
 export default function validate(data, schema) {
-  const result = _validateHelper(data, schema);
+  const result = _validateHelper(data, schema, data);
   const compactResult = _compactResult(result);
   return {
     isValid: result.isValid,
