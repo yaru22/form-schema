@@ -299,7 +299,7 @@ describe('form-schema', () => {
         dataRoot.should.equal(data);
         return {
           isValid: true,
-        }
+        };
       };
       const schema = {
         id: field(testValidator).isRequired(),
