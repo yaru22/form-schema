@@ -1,6 +1,8 @@
 import FormField from './FormField';
 import FormFieldError from './FormFieldError';
 
+export { FormFieldError as FormFieldError };
+
 export function field(...args) {
   return new FormField(...args);
 }
