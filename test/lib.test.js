@@ -290,20 +290,45 @@ describe('form-schema', () => {
   });
 
   describe('validators', () => {
-    it('should supply field data and entire form data', () => {
+    it('should supply field data and its ancestors to the validator', () => {
       const data = {
         id: 'id1',
         name: 'ABC',
+        nested: {
+          random: '123',
+        },
+        arr: [3, 4, 5],
       };
-      const testValidator = (fieldData, dataRoot) => {
-        dataRoot.should.equal(data);
+      const rootFieldsValidator = (fieldData, ancestors) => {
+        ancestors.should.have.length(1);
+        ancestors[0].should.equal(data);
+        return {
+          isValid: true,
+        };
+      };
+      const nestedFieldValidator = (fieldData, ancestors) => {
+        ancestors.should.have.length(2);
+        ancestors[0].should.equal(data.nested);
+        ancestors[1].should.equal(data);
+        return {
+          isValid: true,
+        };
+      };
+      const arrFieldValidator = (fieldData, ancestors) => {
+        ancestors.should.have.length(2);
+        ancestors[0].should.equal(data.arr);
+        ancestors[1].should.equal(data);
         return {
           isValid: true,
         };
       };
       const schema = {
-        id: field(testValidator).isRequired(),
-        name: field(testValidator).isRequired(),
+        id: field(rootFieldsValidator).isRequired(),
+        name: field(rootFieldsValidator).isRequired(),
+        nested: {
+          random: field(nestedFieldValidator),
+        },
+        arr: [field(arrFieldValidator)],
       };
       const { isValid } = validate(data, schema);
       isValid.should.be.true;
