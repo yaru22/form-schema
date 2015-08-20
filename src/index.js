@@ -1,24 +1,26 @@
 import FormField from './FormField';
 import FormFieldError from './FormFieldError';
 
-export { FormFieldError as FormFieldError };
+export { FormFieldError };
 
 export function field(...args) {
   return new FormField(...args);
 }
 
-function _validateHelper(data, schema, ancestors = []) {
+function _validateHelper(data, schema, ancestors = [], keyPath = []) {
   let dataType = typeof data;
   dataType = (dataType === 'object' && Array.isArray(data)) ? 'array' : dataType;
 
   if (schema instanceof FormField) {
     // NOTE: You cannot assume the data at this point is a primitive.
-    const result = schema.validate(data, ancestors);
+    const result = schema.validate(data, ancestors, keyPath);
     return result;
   } else if (Array.isArray(schema)) {  // array
     if (Array.isArray(data)) {
       // iterate array and validate element
-      const resultArr = data.map(x => _validateHelper(x, schema[0], [data, ...ancestors]));
+      const resultArr = data.map((x, index) =>
+        _validateHelper(x, schema[0], [data, ...ancestors], [index, ...keyPath])
+      );
       const isValid = resultArr.every(x => x.isValid);
       return {
         isValid,
@@ -33,7 +35,7 @@ function _validateHelper(data, schema, ancestors = []) {
     if (dataType === 'object') {
       // iterate key and validate value
       const resultObj = Object.keys(schema).reduce((acc, key) => {
-        acc[key] = _validateHelper(data[key], schema[key], [data, ...ancestors]);
+        acc[key] = _validateHelper(data[key], schema[key], [data, ...ancestors], [key, ...keyPath]);
         return acc;
       }, {});
       const isValid = Object.keys(resultObj).every(key => resultObj[key].isValid);

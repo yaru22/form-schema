@@ -8,7 +8,7 @@ export default class FormField {
     return this;
   }
 
-  validate(value, dataRoot) {
+  validate(value, ...rest) {
     if (typeof value === 'undefined') {
       return this._isRequired ? {
         isValid: false,
@@ -19,7 +19,7 @@ export default class FormField {
       };
     }
     const result = this._validators.reduce(({ isValid, errors }, validator) => {
-      const { isValid: valid, error } = validator(value, dataRoot);
+      const { isValid: valid, error } = validator(value, ...rest);
       if (!valid) {
         errors.push(error);
       }

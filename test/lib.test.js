@@ -290,7 +290,7 @@ describe('form-schema', () => {
   });
 
   describe('validators', () => {
-    it('should supply field data and its ancestors to the validator', () => {
+    it('should supply the field data, its ancestors and the keyPath to the validator', () => {
       const data = {
         id: 'id1',
         name: 'ABC',
@@ -299,25 +299,33 @@ describe('form-schema', () => {
         },
         arr: [3, 4, 5],
       };
-      const rootFieldsValidator = (fieldData, ancestors) => {
+      const rootFieldsValidator = (fieldData, ancestors, keyPath) => {
         ancestors.should.have.length(1);
         ancestors[0].should.equal(data);
+        keyPath.should.have.length(1);
+        (keyPath[0] === 'id' || keyPath[0] === 'name').should.be.true;
         return {
           isValid: true,
         };
       };
-      const nestedFieldValidator = (fieldData, ancestors) => {
+      const nestedFieldValidator = (fieldData, ancestors, keyPath) => {
         ancestors.should.have.length(2);
         ancestors[0].should.equal(data.nested);
         ancestors[1].should.equal(data);
+        keyPath.should.have.length(2);
+        keyPath[0].should.equal('random');
+        keyPath[1].should.equal('nested');
         return {
           isValid: true,
         };
       };
-      const arrFieldValidator = (fieldData, ancestors) => {
+      const arrFieldValidator = (fieldData, ancestors, keyPath) => {
         ancestors.should.have.length(2);
         ancestors[0].should.equal(data.arr);
         ancestors[1].should.equal(data);
+        keyPath.should.have.length(2);
+        (keyPath[0] >= 0 && keyPath[0] <= 2).should.be.true;
+        keyPath[1].should.equal('arr');
         return {
           isValid: true,
         };
