@@ -9,7 +9,7 @@ export default class FormField {
   }
 
   validate(value, ...rest) {
-    if (typeof value === 'undefined') {
+    if (typeof value === 'undefined' || (value === null && typeof value === 'object')) {
       return this._isRequired ? {
         isValid: false,
         errors: ['The field is required.'],
