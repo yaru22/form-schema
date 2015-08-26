@@ -1,5 +1,0 @@
-#!/bin/sh -e
-
-source scripts/colors
-echo "${Yellow}Linting...${Rst}"
-`npm bin`/eslint --ext .js,.jsx .

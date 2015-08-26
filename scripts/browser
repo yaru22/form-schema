@@ -1,5 +1,0 @@
-#!/bin/sh -e
-
-source scripts/colors
-echo "${Yellow}Building for browser...${Rst}"
-NODE_ENV=production `npm bin`/webpack src/index.js dist/form-schema.min.js

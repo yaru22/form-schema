@@ -1,5 +1,0 @@
-#!/bin/sh -e
-
-source scripts/colors
-echo "${Yellow}Cleaning...${Rst}"
-rm -rf ./dist ./lib

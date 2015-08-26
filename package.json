@@ -4,11 +4,13 @@
   "description": "A form validation tool that traverses the data according to the schema and calls the validators.",
   "main": "lib/index.js",
   "scripts": {
-    "browser": "scripts/browser",
-    "build": "scripts/build",
-    "clean": "scripts/clean",
-    "lint": "scripts/lint",
-    "prepublish": "scripts/prepublish",
+    "build": "npm run build:lib && npm run build:umd && npm run build:umd:min",
+    "build:lib": "`npm bin`/babel src --out-dir lib",
+    "build:umd": "NODE_ENV=development `npm bin`/webpack src/index.js dist/form-schema.js",
+    "build:umd:min": "NODE_ENV=production `npm bin`/webpack src/index.js dist/form-schema.min.js",
+    "clean": "rm -rf ./dist ./lib",
+    "lint": "`npm bin`/eslint --ext .js,.jsx .",
+    "prepublish": "npm run lint && npm run test && npm run clean && npm run build",
     "test": "scripts/test",
     "test:watch": "scripts/test-watch"
   },

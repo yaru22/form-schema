@@ -1,5 +1,0 @@
-#!/bin/sh -e
-
-source scripts/colors
-echo "${Yellow}Building lib/...${Rst}"
-`npm bin`/babel src --out-dir lib
