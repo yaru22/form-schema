@@ -29,7 +29,7 @@ module.exports = {
     ],
   },
   output: {
-    library: 'Foo',
+    library: 'form-schema',
     libraryTarget: 'umd',
   },
   plugins: plugins,
