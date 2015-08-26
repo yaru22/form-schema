@@ -1,6 +1,6 @@
 {
   "name": "form-schema",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A form validation tool that traverses the data according to the schema and calls the validators.",
   "main": "lib/index.js",
   "webpack": "src/index.js",
