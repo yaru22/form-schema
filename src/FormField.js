@@ -1,11 +1,20 @@
 export default class FormField {
-  constructor(...args) {
+  constructor(attrs) {
+    this._attrs = attrs;
+  }
+
+  validators(...args) {
     this._validators = args;
+    return this;
   }
 
   isRequired() {
     this._isRequired = true;
     return this;
+  }
+
+  getAttributes() {
+    return this._attrs;
   }
 
   validate(value, ...rest) {
