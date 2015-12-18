@@ -1,18 +1,12 @@
 // https://medium.com/@dan_abramov/lint-like-it-s-2015-6987d44c5b48
 // Install eslint, babel-eslint and eslint-plugin-react locally.
-// ~/ $ npm install eslint, babel-eslint, eslint-plugin-react
+// ~/ $ npm install eslint babel-eslint --save-dev
 //
 // Customized upon https://github.com/airbnb/javascript/blob/master/linters/.eslintrc
 {
   // https://github.com/babel/babel-eslint
   "parser": "babel-eslint",
 
-  "plugins": [
-    // https://github.com/yannickcr/eslint-plugin-react
-    "react"
-  ],
-
-  // TODO: Configure environments using the configuration cascades.
   "env": {
     "browser": true,
     "node": true,
@@ -283,71 +277,5 @@
       // space here to support sprockets directives
       "markers": ["=", "!"]
     }],
-
-    /**
-     * JSX style
-     */
-     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/display-name.md
-    "react/display-name": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-boolean-value.md
-    "react/jsx-boolean-value": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-undef.md
-    "react/jsx-no-undef": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-quotes.md
-    "jsx-quotes": [2, "prefer-double"],
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-sort-props.md
-    "react/jsx-sort-props": 0,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-sort-prop-types.md
-    "react/jsx-sort-prop-types": 0,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-uses-react.md
-    "react/jsx-uses-react": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-uses-vars.md
-    "react/jsx-uses-vars": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/no-did-mount-set-state.md
-    "react/no-did-mount-set-state": 0,  // [2, "allow-in-func"],
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/no-did-update-set-state.md
-    "react/no-did-update-set-state": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/no-multi-comp.md
-    "react/no-multi-comp": 0,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/no-unknown-property.md
-    "react/no-unknown-property": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/prop-types.md
-    "react/prop-types": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/react-in-jsx-scope.md
-    "react/react-in-jsx-scope": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/self-closing-comp.md
-    "react/self-closing-comp": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/wrap-multilines.md
-    "react/wrap-multilines": 2,
-    // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/sort-comp.md
-    "react/sort-comp": [2, {
-      "order": [
-        "displayName",
-        "mixins",
-        "propTypes",
-        "contextTypes",
-        "childContextTypes",
-        "statics",
-        "defaultProps",
-        "constructor",
-        "getDefaultProps",
-        "getInitialState",
-        "getChildContext",
-        "componentWillMount",
-        "componentDidMount",
-        "componentWillReceiveProps",
-        "shouldComponentUpdate",
-        "componentWillUpdate",
-        "componentDidUpdate",
-        "componentWillUnmount",
-        "/^on.+$/",
-        "/^is.+$/",
-        "/^get.+$/",
-        "/^set.+$/",
-        "/^_.+$/",
-        "/^render.+$/",
-        "render"
-      ]
-    }]
   }
 }
