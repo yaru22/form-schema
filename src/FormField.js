@@ -8,9 +8,13 @@ export default class FormField {
     return this;
   }
 
-  isRequired() {
+  required() {
     this._isRequired = true;
     return this;
+  }
+
+  isRequired() {
+    return this._isRequired;
   }
 
   getAttributes() {

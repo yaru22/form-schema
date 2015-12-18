@@ -74,14 +74,14 @@ describe('form-schema', () => {
     });
 
     it('should validate required field', () => {
-      const schema = field().validators(isString).isRequired();
+      const schema = field().validators(isString).required();
       const data = 'hello';
       const { isValid } = validate(data, schema);
       isValid.should.be.true;
     });
 
     it('should fail to validate due to missing required field', () => {
-      const schema = field().validators(isString).isRequired();
+      const schema = field().validators(isString).required();
       const { isValid, errors } = validate(undefined, schema);
       isValid.should.be.false;
       errors.reasons.should.have.length(1);
@@ -124,7 +124,7 @@ describe('form-schema', () => {
       });
 
       it('should fail to validate due to required element missing', () => {
-        const schema = [field().validators(isString).isRequired()];
+        const schema = [field().validators(isString).required()];
         const data = ['hello', 'world', undefined];
         const { isValid, errors } = validate(data, schema);
         isValid.should.be.false;
@@ -188,9 +188,9 @@ describe('form-schema', () => {
 
       it('should fail to validate due to required key missing', () => {
         const schema = {
-          id: field().validators(isString).isRequired(),
-          name: field().validators(isString).isRequired(),
-          isMale: field().validators(isBoolean).isRequired(),
+          id: field().validators(isString).required(),
+          name: field().validators(isString).required(),
+          isMale: field().validators(isBoolean).required(),
         };
         const data = {
           name: 'Brian',
@@ -251,10 +251,10 @@ describe('form-schema', () => {
 
       it('should validate an object with arrays', () => {
         const schema = {
-          id: field().validators(isString).isRequired(),
-          name: field().validators(isString).isRequired(),
+          id: field().validators(isString).required(),
+          name: field().validators(isString).required(),
           biweekly: field().validators(isBoolean),
-          data: [field().validators(isNumber).isRequired()],
+          data: [field().validators(isNumber).required()],
         };
         const data = {
           id: 'id1',
@@ -268,10 +268,10 @@ describe('form-schema', () => {
 
       it('should fail to validate an object with missing required field', () => {
         const schema = {
-          id: field().validators(isString).isRequired(),
-          name: field().validators(isString).isRequired(),
+          id: field().validators(isString).required(),
+          name: field().validators(isString).required(),
           biweekly: field().validators(isBoolean),
-          data: [field().validators(isNumber).isRequired()],
+          data: [field().validators(isNumber).required()],
         };
         const data = {
           name: 'ABC',
@@ -331,8 +331,8 @@ describe('form-schema', () => {
         };
       };
       const schema = {
-        id: field().validators(rootFieldsValidator).isRequired(),
-        name: field().validators(rootFieldsValidator).isRequired(),
+        id: field().validators(rootFieldsValidator).required(),
+        name: field().validators(rootFieldsValidator).required(),
         nested: {
           random: field().validators(nestedFieldValidator),
         },
@@ -351,7 +351,7 @@ describe('form-schema', () => {
         placeholder: 'Email',
       };
       const schema = {
-        email: field(attrs).validators(isString).isRequired(),
+        email: field(attrs).validators(isString).required(),
       };
       schema.email.getAttributes().should.eql(attrs);
     });
