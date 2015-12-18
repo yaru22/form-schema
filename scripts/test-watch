@@ -4,7 +4,7 @@ source scripts/colors
 echo "${Yellow}Running tests.${Rst}"
 
 NODE_ENV=test NODE_PATH=.:${NODE_PATH} `npm bin`/mocha \
-    --compilers js:babel/register \
+    --compilers js:babel-register \
     --bail \
     --check-leaks \
     --growl \
