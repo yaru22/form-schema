@@ -1,9 +1,9 @@
 {
   "excludeFiles": [
-    "**/build/**",
-    "**/node_modules/**",
-    "**/static/**",
-    "**/test/data*"
+    "**/dist/**",
+    "**/lib/**",
+    "**/node_modules/**"
+    "**/scripts/**"
   ],
 
 
@@ -63,13 +63,14 @@
   "requireSpacesInConditionalExpression": true,
   "requireSpacesInConditionalExpression": true,
   "requireSpacesInFunctionExpression": {
+    "beforeOpeningRoundBrace": false,
     "beforeOpeningCurlyBrace": true
   },
   "requireSpacesInsideObjectBrackets": "all",
 
 
   "validateIndentation": 2,
-  "validateJSDoc": {
+  "jsDoc": {
     "checkParamNames": true,
     "requireParamTypes": true
   },
