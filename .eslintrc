@@ -294,7 +294,7 @@
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-no-undef.md
     "react/jsx-no-undef": 2,
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-quotes.md
-    "react/jsx-quotes": [2, "double", "avoid-escape"],
+    "jsx-quotes": [2, "prefer-double"],
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-sort-props.md
     "react/jsx-sort-props": 0,
     // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-sort-prop-types.md

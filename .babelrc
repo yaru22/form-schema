@@ -1,12 +1,7 @@
 {
-  "optional": [
-    "es7.asyncFunctions",
-    "es7.classProperties",
-    "es7.decorators",
-    "es7.objectRestSpread",
-    "runtime"
-  ],
   "ignore": [
     "node_modules"
-  ]
+  ],
+  "plugins": ["transform-runtime"],
+  "presets": ["es2015", "stage-0"]
 }
