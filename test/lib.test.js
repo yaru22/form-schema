@@ -1,6 +1,6 @@
 import chai from 'chai';
 
-import validate, { field } from '../src/';
+import { form, field, validate } from '../src/';
 
 const should = chai.should();
 
@@ -120,7 +120,7 @@ describe('form-schema', () => {
         const { isValid, errors } = validate(data, schema);
         isValid.should.be.false;
         errors.reasons.should.have.length(1);
-        errors.reasons[0].should.equal('Expected an array but got a object.');
+        errors.reasons[0].should.equal('Expected array but got object.');
       });
 
       it('should fail to validate due to required element missing', () => {
@@ -183,7 +183,7 @@ describe('form-schema', () => {
         const { isValid, errors } = validate(data, schema);
         isValid.should.be.false;
         errors.reasons.should.have.length(1);
-        errors.reasons[0].should.equal('Expected an object but got a array.');
+        errors.reasons[0].should.equal('Expected object but got array.');
       });
 
       it('should fail to validate due to required key missing', () => {
@@ -244,7 +244,7 @@ describe('form-schema', () => {
         const { isValid, errors } = validate(data, schema);
         isValid.should.be.false;
         errors.should.have.length(data.length);
-        errors[1].reasons[0].should.equal('Expected an object but got a string.');
+        errors[1].reasons[0].should.equal('Expected object but got string.');
         errors[2].name.reasons.should.have.length(1);
         errors[2].name.reasons[0].should.equal('not a string');
       });
@@ -285,6 +285,141 @@ describe('form-schema', () => {
         should.equal(null, errors.data);
         errors.id.reasons.should.have.length(1);
         errors.id.reasons[0].should.equal('The field is required.');
+      });
+    });
+
+    describe('optional and/or nested form', () => {
+      it('should validate undefined/null if the form is not required', () => {
+        const schema = form({
+          name: field().validators(isString).required(),
+          age: field().validators(isNumber),
+        });
+        let { isValid } = validate(null, schema);
+        isValid.should.be.true;
+        ({ isValid } = validate(undefined, schema));
+        isValid.should.be.true;
+      });
+
+      it('should validate undefined/null if the nested form is not required', () => {
+        const schema = {
+          name: field().validators(isString).required(),
+          age: field().validators(isNumber),
+          address: form({
+            line1: field().validators(isString).required(),
+            line2: field().validators(isString),
+            locality: field().validators(isString).required(),
+            region: field().validators(isString).required(),
+            postalCode: field().validators(isString).required(),
+            country: field().validators(isString).required(),
+          }),
+        };
+        const dataNull = {
+          name: 'Brian',
+          age: 29,
+          address: null,
+        };
+        let { isValid } = validate(dataNull, schema);
+        isValid.should.be.true;
+        const dataUndefined = {
+          name: 'Brian',
+          age: 29,
+          address: undefined,
+        };
+        ({ isValid } = validate(dataUndefined, schema));
+        isValid.should.be.true;
+      });
+
+      it('should not validate if the required nested form is null', () => {
+        const schema = {
+          name: field().validators(isString).required(),
+          age: field().validators(isNumber),
+          address: form({
+            line1: field().validators(isString).required(),
+            line2: field().validators(isString),
+            locality: field().validators(isString).required(),
+            region: field().validators(isString).required(),
+            postalCode: field().validators(isString).required(),
+            country: field().validators(isString).required(),
+          }).required(),
+        };
+        const data = {
+          name: 'Brian',
+          age: 29,
+          address: null,
+        };
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.false;
+        should.equal(null, errors.name);
+        should.equal(null, errors.age);
+        errors.address.reasons.should.have.length(1);
+        errors.address.reasons[0].should.equal('The form is required.');
+      });
+
+      it('should validate if the required nested form is valid', () => {
+        const schema = {
+          name: field().validators(isString).required(),
+          age: field().validators(isNumber),
+          address: form({
+            line1: field().validators(isString).required(),
+            line2: field().validators(isString),
+            locality: field().validators(isString).required(),
+            region: field().validators(isString).required(),
+            postalCode: field().validators(isString).required(),
+            country: field().validators(isString).required(),
+          }).required(),
+        };
+        const data = {
+          name: 'Brian',
+          age: 29,
+          address: {
+            line1: '123 Test St.',
+            line2: 'Unit #903',
+            locality: 'North York',
+            region: 'Toronto',
+            postalCode: 'A1B2C3',
+            country: 'Canada',
+          },
+        };
+        const { isValid } = validate(data, schema);
+        isValid.should.be.true;
+      });
+
+      it('should not validate if the required nested form is invalid', () => {
+        const schema = {
+          name: field().validators(isString).required(),
+          age: field().validators(isNumber),
+          address: form({
+            line1: field().validators(isString).required(),
+            line2: field().validators(isString),
+            locality: field().validators(isString).required(),
+            region: field().validators(isString).required(),
+            postalCode: field().validators(isString).required(),
+            country: field().validators(isString).required(),
+          }).required(),
+        };
+        const data = {
+          name: 'Brian',
+          age: 29,
+          address: {
+            line1: null,
+            line2: null,
+            locality: 'North York',
+            region: 'Toronto',
+            postalCode: 12345,
+            country: 'Canada',
+          },
+        };
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.false;
+        should.equal(null, errors.name);
+        should.equal(null, errors.age);
+        errors.address.line1.reasons.should.have.length(1);
+        errors.address.line1.reasons[0].should.equal('The field is required.');
+        should.equal(null, errors.address.line2);
+        should.equal(null, errors.address.locality);
+        should.equal(null, errors.address.region);
+        errors.address.postalCode.reasons.should.have.length(1);
+        errors.address.postalCode.reasons[0].should.equal('not a string');
       });
     });
   });

@@ -1,25 +1,75 @@
-import FormField from './FormField';
-import FormFieldError from './FormFieldError';
+import { formError, FormError } from './FormError';
+import { FormField } from './FormField';
+import { formFieldError, FormFieldError } from './FormFieldError';
 
-export { FormFieldError };
+//
+// NOTE: Couldn't put Form class into its own file src/Form.js because doing so
+// would result in a Webpack build error "a dependency to an entry point is not allowed".
+// See https://github.com/webpack/webpack/issues/300 for more details.
+// It's quite a peculiar error. Probably the cause of the error is the circular
+// dependency between src/Form.js and src/index.js. Until the library is re-designed
+// to avoid such circular dependency, Form class will reside in this file.
+//
+
+export class Form {
+  constructor(schema) {
+    this._schema = schema;
+  }
+
+  getSchema() {
+    return this._schema;
+  }
+
+  required() {
+    this._isRequired = true;
+    return this;
+  }
+
+  validate(data, ...rest) {
+    if (typeof data === 'undefined' || (data === null && typeof data === 'object')) {
+      return this._isRequired ? {
+        isValid: false,
+        errors: ['The form is required.'],
+      } : {
+        isValid: true,
+        errors: [],
+      };
+    }
+    /* eslint-disable no-use-before-define */
+    const result = validateHelper(data, this._schema, ...rest);
+    /* eslint-enable no-use-before-define */
+    return result;
+  }
+}
+
+export function form(...args) {
+  return new Form(...args);
+}
 
 export function field(...args) {
   return new FormField(...args);
 }
 
-function _validateHelper(data, schema, ancestors = [], keyPath = []) {
+export { FormError, FormFieldError };
+
+function validateHelper(data, schema, ancestors = [], keyPath = []) {
   let dataType = typeof data;
   dataType = (dataType === 'object' && Array.isArray(data)) ? 'array' : dataType;
 
-  if (schema instanceof FormField) {
+  if (schema instanceof Form) {
+    const result = schema.validate(data, ancestors, keyPath);
+    result.errorFactory = formError;
+    return result;
+  } else if (schema instanceof FormField) {
     // NOTE: You cannot assume the data at this point is a primitive.
     const result = schema.validate(data, ancestors, keyPath);
+    result.errorFactory = formFieldError;
     return result;
   } else if (Array.isArray(schema)) {  // array
     if (Array.isArray(data)) {
       // iterate array and validate element
       const resultArr = data.map((x, index) =>
-        _validateHelper(x, schema[0], [data, ...ancestors], [index, ...keyPath])
+        validateHelper(x, schema[0], [data, ...ancestors], [index, ...keyPath])
       );
       const isValid = resultArr.every(x => x.isValid);
       return {
@@ -29,13 +79,14 @@ function _validateHelper(data, schema, ancestors = [], keyPath = []) {
     }
     return {
       isValid: false,
-      errors: [`Expected an array but got a ${dataType}.`],
+      errors: [`Expected array but got ${dataType}.`],
+      errorFactory: formFieldError,
     };
   } else if (typeof schema === 'object') {  // object
     if (dataType === 'object') {
       // iterate key and validate value
       const resultObj = Object.keys(schema).reduce((acc, key) => {
-        acc[key] = _validateHelper(data[key], schema[key], [data, ...ancestors], [key, ...keyPath]);
+        acc[key] = validateHelper(data[key], schema[key], [data, ...ancestors], [key, ...keyPath]);
         return acc;
       }, {});
       const isValid = Object.keys(resultObj).every(key => resultObj[key].isValid);
@@ -46,35 +97,36 @@ function _validateHelper(data, schema, ancestors = [], keyPath = []) {
     }
     return {
       isValid: false,
-      errors: [`Expected an object but got a ${dataType}.`],
+      errors: [`Expected object but got ${dataType}.`],
+      errorFactory: formFieldError,
     };
   }
-  throw new Error('_validateHelper(): Not supposed to reach here.');
+  throw new Error('validateHelper(): Not supposed to reach here.');
 }
 
-function _compactResult(result) {
+function compactResult(result) {
   if (result.isValid) {
     return null;
   } else if (result.result) {
     const subResult = result.result;
     if (Array.isArray(subResult)) {
-      return subResult.map(_compactResult);
+      return subResult.map(compactResult);
     } else if (typeof subResult === 'object') {
       return Object.keys(subResult).reduce((acc, key) => {
-        acc[key] = _compactResult(subResult[key]);
+        acc[key] = compactResult(subResult[key]);
         return acc;
       }, {});
     }
-    throw new Error('_compactResult(): Not supposed to reach here.');
+    throw new Error('compactResult(): Not supposed to reach here.');
   }
-  return new FormFieldError(result.errors, result.data);
+  return result.errorFactory(result.errors, result.data);
 }
 
-export default function validate(data, schema) {
-  const result = _validateHelper(data, schema);
-  const compactResult = _compactResult(result);
+export function validate(data, schema) {
+  const result = validateHelper(data, schema);
+  const compactedResult = compactResult(result);
   return {
     isValid: result.isValid,
-    errors: compactResult,
+    errors: compactedResult,
   };
 }

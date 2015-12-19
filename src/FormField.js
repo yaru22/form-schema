@@ -1,4 +1,4 @@
-export default class FormField {
+export class FormField {
   constructor(attrs) {
     this._attrs = attrs;
   }
