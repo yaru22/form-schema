@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-source scripts/colors
+. ./scripts/colors
 echo "${Yellow}Running tests.${Rst}"
 
 NODE_ENV=test NODE_PATH=.:${NODE_PATH} `npm bin`/mocha \
