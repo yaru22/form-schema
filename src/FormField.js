@@ -1,6 +1,7 @@
 export class FormField {
   constructor(attrs) {
     this._attrs = attrs;
+    this._validators = [];
   }
 
   validators(...args) {
