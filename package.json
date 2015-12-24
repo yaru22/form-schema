@@ -34,6 +34,7 @@
     "chai": "^3.4.1",
     "cz-conventional-changelog": "^1.1.5",
     "eslint": "^1.10.3",
+    "ghooks": "^1.0.1",
     "mocha": "^2.3.4",
     "semantic-release": "^4.3.5",
     "webpack": "^1.12.9"
@@ -45,6 +46,9 @@
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
+    },
+    "ghooks": {
+      "pre-commit": "npm run test"
     }
   }
 }
