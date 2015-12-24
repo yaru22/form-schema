@@ -11,8 +11,8 @@
     "clean": "rm -rf ./dist ./lib",
     "lint": "`npm bin`/eslint --ext .js,.jsx .",
     "prepublish": "npm run lint && npm run test && npm run clean && npm run build",
-    "test": "scripts/test",
-    "test:watch": "scripts/test-watch",
+    "test": "./scripts/test",
+    "test:watch": "./scripts/test-watch",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "keywords": [
