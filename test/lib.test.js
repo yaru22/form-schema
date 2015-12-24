@@ -425,6 +425,19 @@ describe('form-schema', () => {
   });
 
   describe('validators', () => {
+    it('should run without any exception if no validators are given', function () {
+      const data = {
+        name: 'Brian',
+      };
+      const schema = {
+        name: field(),
+      };
+      should.not.Throw(() => {
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.true;
+      });
+    });
+
     it('should supply the field data, its ancestors and the keyPath to the validator', () => {
       const data = {
         id: 'id1',
