@@ -425,7 +425,7 @@ describe('form-schema', () => {
   });
 
   describe('validators', () => {
-    it('should run without any exception if no validators are given', function () {
+    it('should run without any exception if no validators are given', () => {
       const data = {
         name: 'Brian',
       };
@@ -433,7 +433,7 @@ describe('form-schema', () => {
         name: field(),
       };
       should.not.Throw(() => {
-        const { isValid, errors } = validate(data, schema);
+        const { isValid } = validate(data, schema);
         isValid.should.be.true;
       });
     });
