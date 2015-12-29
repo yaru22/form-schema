@@ -52,9 +52,14 @@ export function field(...args) {
 
 export { FormError, FormFieldError };
 
-function validateHelper(data, schema, ancestors = [], keyPath = []) {
+function validateHelper(data, _schema, ancestors = [], keyPath = []) {
   let dataType = typeof data;
   dataType = (dataType === 'object' && Array.isArray(data)) ? 'array' : dataType;
+
+  let schema = _schema;
+  if (typeof schema === 'function') {
+    schema = _schema();
+  }
 
   if (schema instanceof Form) {
     const result = schema.validate(data, ancestors, keyPath);

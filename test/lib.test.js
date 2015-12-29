@@ -424,6 +424,39 @@ describe('form-schema', () => {
     });
   });
 
+  describe('function schema', () => {
+    it('should work even if a function that returns a schema is given in lieu of schema object', () => {
+      const schema = () => {
+        return {
+          name: field().validators(isString).required(),
+          age: field().validators(isNumber),
+          address: form({
+            line1: field().validators(isString).required(),
+            line2: field().validators(isString),
+            locality: field().validators(isString).required(),
+            region: field().validators(isString).required(),
+            postalCode: field().validators(isString).required(),
+            country: field().validators(isString).required(),
+          }).required(),
+        };
+      };
+      const data = {
+        name: 'Brian',
+        age: 29,
+        address: {
+          line1: '123 Test St.',
+          line2: 'Unit #903',
+          locality: 'North York',
+          region: 'Toronto',
+          postalCode: 'A1B2C3',
+          country: 'Canada',
+        },
+      };
+      const { isValid } = validate(data, schema);
+      isValid.should.be.true;
+    });
+  });
+
   describe('validators', () => {
     it('should run without any exception if no validators are given', () => {
       const data = {
