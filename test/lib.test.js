@@ -1,6 +1,6 @@
 import chai from 'chai';
 
-import { form, field, validate } from '../src/';
+import { form, field, validate, ANY_KEY } from '../src/';
 
 const should = chai.should();
 
@@ -202,6 +202,53 @@ describe('form-schema', () => {
         should.equal(null, errors.isMale);
         errors.id.reasons.should.have.length(1);
         errors.id.reasons[0].should.equal('The field is required.');
+      });
+    });
+
+    describe('object with special key, ANY_KEY', () => {
+      it('should validate all values of the object regardless of key ', () => {
+        const data = {
+          1: {
+            id: 1,
+            item: 'Macbook',
+          },
+          2: {
+            id: 2,
+            item: 'iPad',
+          },
+        };
+        const schema = {
+          [ANY_KEY]: {
+            id: field().validators(isNumber).required(),
+            item: field().validators(isString).required(),
+          },
+        };
+        const { isValid } = validate(data, schema);
+        isValid.should.be.true;
+      });
+
+      it('should not validate even if one value of the object does not validate', () => {
+        const data = {
+          1: {
+            id: 1,
+            item: 'Macbook',
+          },
+          2: {
+            id: 'not-a-valid-id',
+            item: 'iPad',
+          },
+        };
+        const schema = {
+          [ANY_KEY]: {
+            id: field().validators(isNumber).required(),
+            item: field().validators(isString).required(),
+          },
+        };
+        const { isValid, errors } = validate(data, schema);
+        isValid.should.be.false;
+        should.equal(null, errors[1]);
+        errors[2].id.reasons.should.have.length(1);
+        errors[2].id.reasons[0].should.have.equal('not a number');
       });
     });
 

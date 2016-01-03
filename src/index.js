@@ -42,6 +42,8 @@ export class Form {
   }
 }
 
+export const ANY_KEY = Symbol('any key');
+
 export function form(...args) {
   return new Form(...args);
 }
@@ -89,11 +91,21 @@ function validateHelper(data, _schema, ancestors = [], keyPath = []) {
     };
   } else if (typeof schema === 'object') {  // object
     if (dataType === 'object') {
-      // iterate key and validate value
-      const resultObj = Object.keys(schema).reduce((acc, key) => {
-        acc[key] = validateHelper(data[key], schema[key], [data, ...ancestors], [key, ...keyPath]);
-        return acc;
-      }, {});
+      let resultObj = null;
+      // If the special key, ANY_KEY, is present, use its value as schema to
+      // validate all the values in the data.
+      if (schema[ANY_KEY]) {
+        resultObj = Object.keys(data).reduce((acc, key) => {
+          acc[key] = validateHelper(data[key], schema[ANY_KEY], [data, ...ancestors], [key, ...keyPath]);
+          return acc;
+        }, {});
+      } else {
+        // iterate key and validate value
+        resultObj = Object.keys(schema).reduce((acc, key) => {
+          acc[key] = validateHelper(data[key], schema[key], [data, ...ancestors], [key, ...keyPath]);
+          return acc;
+        }, {});
+      }
       const isValid = Object.keys(resultObj).every(key => resultObj[key].isValid);
       return {
         isValid,
